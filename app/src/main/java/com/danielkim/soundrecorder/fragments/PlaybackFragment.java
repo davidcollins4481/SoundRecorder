@@ -13,6 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -42,6 +45,9 @@ public class PlaybackFragment extends DialogFragment{
     private TextView mCurrentProgressTextView = null;
     private TextView mFileNameTextView = null;
     private TextView mFileLengthTextView = null;
+    private ImageView editIcon = null;
+    private ImageView cancelIcon = null;
+    private EditText editFileNameView = null;
 
     //stores whether or not the mediaplayer is currently playing audio
     private boolean isPlaying = false;
@@ -85,8 +91,11 @@ public class PlaybackFragment extends DialogFragment{
         View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_media_playback, null);
 
         mFileNameTextView = (TextView) view.findViewById(R.id.file_name_text_view);
+        editFileNameView = (EditText) view.findViewById(R.id.file_name_text_edit);
         mFileLengthTextView = (TextView) view.findViewById(R.id.file_length_text_view);
         mCurrentProgressTextView = (TextView) view.findViewById(R.id.current_progress_text_view);
+        editIcon = (ImageView) view.findViewById(R.id.edit_action_icon);
+        cancelIcon = (ImageView) view.findViewById(R.id.edit_action_cancel);
 
         mSeekBar = (SeekBar) view.findViewById(R.id.seekbar);
         ColorFilter filter = new LightingColorFilter
@@ -148,6 +157,20 @@ public class PlaybackFragment extends DialogFragment{
 
         mFileNameTextView.setText(item.getName());
         mFileLengthTextView.setText(String.format("%02d:%02d", minutes,seconds));
+
+        editIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editFilename();
+            }
+        });
+
+        mFileNameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editFilename();
+            }
+        });
 
         builder.setView(view);
 
@@ -293,6 +316,43 @@ public class PlaybackFragment extends DialogFragment{
 
         //allow the screen to turn off again once audio is finished playing
         getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void editFilename() {
+        Log.d("PlaybckFragment", "Editing File name");
+        toggleEditState(true);
+
+        cancelIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleEditState(false);
+            }
+        });
+    }
+
+    private void toggleEditState(boolean editing) {
+        if (editing) {
+            mFileNameTextView.setVisibility(View.GONE);
+            editFileNameView.setVisibility(View.VISIBLE);
+            cancelIcon.setVisibility(View.VISIBLE);
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(editIcon.getWidth(), editIcon.getHeight());
+            params.addRule(RelativeLayout.RIGHT_OF, editFileNameView.getId());
+            params.addRule(RelativeLayout.END_OF, editFileNameView.getId());
+            editIcon.setLayoutParams(params);
+
+            editFileNameView.setText(mFileNameTextView.getText());
+            editFileNameView.setSelection(0, mFileNameTextView.getText().length());
+        } else {
+            mFileNameTextView.setVisibility(View.VISIBLE);
+            editFileNameView.setVisibility(View.GONE);
+            cancelIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(editIcon.getWidth(), editIcon.getHeight());
+            params.addRule(RelativeLayout.RIGHT_OF, mFileNameTextView.getId());
+            params.addRule(RelativeLayout.END_OF, mFileNameTextView.getId());
+            editIcon.setLayoutParams(params);
+        }
     }
 
     //updating mSeekBar
