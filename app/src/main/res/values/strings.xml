@@ -54,4 +54,5 @@
 
     <!-- Text placeholders -->
     <string name="placeholder_recording_file_name">file_name.mp4</string>
+    <string name="placeholder_recording_file_extension">.mp4</string>
 </resources>

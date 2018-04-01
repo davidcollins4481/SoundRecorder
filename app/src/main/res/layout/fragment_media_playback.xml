@@ -55,6 +55,21 @@
                     android:visibility="gone"
                     android:textSize="18sp" />
 
+                <TextView
+                    android:id="@+id/file_extension_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_toRightOf="@id/file_name_text_edit"
+                    android:layout_toEndOf="@id/file_name_text_edit"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/placeholder_recording_file_extension"
+                    android:visibility="gone"
+                    android:textSize="18sp" />
+
                 <ImageView
                     android:id="@+id/edit_action_icon"
                     android:layout_width="25dp"

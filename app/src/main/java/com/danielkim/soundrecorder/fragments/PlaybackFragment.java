@@ -51,6 +51,7 @@ public class PlaybackFragment extends DialogFragment{
     private ImageView editIcon = null;
     private ImageView cancelIcon = null;
     private EditText editFileNameView = null;
+    private TextView fileExtensionTextView = null;
     private OnRecordingItemChangedListener changeListener;
     //stores whether or not the mediaplayer is currently playing audio
     private boolean isPlaying = false;
@@ -102,6 +103,7 @@ public class PlaybackFragment extends DialogFragment{
         editFileNameView = (EditText) view.findViewById(R.id.file_name_text_edit);
         mFileLengthTextView = (TextView) view.findViewById(R.id.file_length_text_view);
         mCurrentProgressTextView = (TextView) view.findViewById(R.id.current_progress_text_view);
+        fileExtensionTextView = (TextView) view.findViewById(R.id.file_extension_text_view);
         editIcon = (ImageView) view.findViewById(R.id.edit_action_icon);
         cancelIcon = (ImageView) view.findViewById(R.id.edit_action_cancel);
 
@@ -189,6 +191,7 @@ public class PlaybackFragment extends DialogFragment{
         cancelIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isEditing = false;
                 toggleEditState(false);
             }
         });
@@ -344,7 +347,7 @@ public class PlaybackFragment extends DialogFragment{
     }
 
     private void updateFilename() {
-        String newFileName = editFileNameView.getText().toString();
+        String newFileName = editFileNameView.getText().toString() + ".mp4";
 
         mFileNameTextView.setText(newFileName);
         this.changeListener.onRecordingItemRenamed(newFileName);
@@ -359,19 +362,19 @@ public class PlaybackFragment extends DialogFragment{
             cancelIcon.setVisibility(View.VISIBLE);
 
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(editIcon.getWidth(), editIcon.getHeight());
-            params.addRule(RelativeLayout.RIGHT_OF, editFileNameView.getId());
-            params.addRule(RelativeLayout.END_OF, editFileNameView.getId());
+            params.addRule(RelativeLayout.RIGHT_OF, fileExtensionTextView.getId());
+            params.addRule(RelativeLayout.END_OF, fileExtensionTextView.getId());
             editIcon.setLayoutParams(params);
 
             editIcon.setImageResource(R.drawable.ic_action_save);
-
-            editFileNameView.setText(mFileNameTextView.getText());
-            editFileNameView.setSelection(0, mFileNameTextView.getText().length());
+            fileExtensionTextView.setVisibility(View.VISIBLE);
+            editFileNameView.setText("");
         } else {
             mFileNameTextView.setVisibility(View.VISIBLE);
             editFileNameView.setVisibility(View.GONE);
             cancelIcon.setVisibility(View.GONE);
             editIcon.setImageResource(R.drawable.ic_action_edit);
+            fileExtensionTextView.setVisibility(View.GONE);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(editIcon.getWidth(), editIcon.getHeight());
             params.addRule(RelativeLayout.RIGHT_OF, mFileNameTextView.getId());
             params.addRule(RelativeLayout.END_OF, mFileNameTextView.getId());
