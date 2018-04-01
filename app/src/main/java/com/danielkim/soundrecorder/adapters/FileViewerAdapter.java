@@ -24,9 +24,8 @@ import com.danielkim.soundrecorder.R;
 import com.danielkim.soundrecorder.RecordingItem;
 import com.danielkim.soundrecorder.fragments.PlaybackFragment;
 import com.danielkim.soundrecorder.listeners.OnDatabaseChangedListener;
-
+import com.danielkim.soundrecorder.listeners.OnRecordingItemChangedListener;
 import java.io.File;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 
@@ -72,7 +71,6 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
             )
         );
 
-        // define an on click listener to open PlaybackFragment
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,6 +81,13 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
                     FragmentTransaction transaction = ((FragmentActivity) mContext)
                             .getSupportFragmentManager()
                             .beginTransaction();
+
+                    playbackFragment.setOnRecordingItemChangedListener(new OnRecordingItemChangedListener() {
+                        @Override
+                        public void onRecordingItemRenamed(String newFileName) {
+                            rename(holder.getPosition(), newFileName);
+                        }
+                    });
 
                     playbackFragment.show(transaction, "dialog_playback");
 
@@ -178,7 +183,6 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
     }
 
     @Override
-    //TODO
     public void onDatabaseEntryRenamed() {
 
     }

@@ -19,8 +19,10 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.danielkim.soundrecorder.DBHelper;
 import com.danielkim.soundrecorder.R;
 import com.danielkim.soundrecorder.RecordingItem;
+import com.danielkim.soundrecorder.listeners.OnRecordingItemChangedListener;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class PlaybackFragment extends DialogFragment{
     private Handler mHandler = new Handler();
 
     private MediaPlayer mMediaPlayer = null;
+    private DBHelper mDatabase = null;
 
     private SeekBar mSeekBar = null;
     private FloatingActionButton mPlayButton = null;
@@ -48,9 +51,11 @@ public class PlaybackFragment extends DialogFragment{
     private ImageView editIcon = null;
     private ImageView cancelIcon = null;
     private EditText editFileNameView = null;
-
+    private OnRecordingItemChangedListener changeListener;
     //stores whether or not the mediaplayer is currently playing audio
     private boolean isPlaying = false;
+
+    private boolean isEditing = false;
 
     //stores minutes and seconds of the length of the file.
     long minutes = 0;
@@ -64,6 +69,7 @@ public class PlaybackFragment extends DialogFragment{
 
         return f;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +95,8 @@ public class PlaybackFragment extends DialogFragment{
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_media_playback, null);
+
+        mDatabase = new DBHelper(getActivity().getApplicationContext());
 
         mFileNameTextView = (TextView) view.findViewById(R.id.file_name_text_view);
         editFileNameView = (EditText) view.findViewById(R.id.file_name_text_edit);
@@ -161,7 +169,13 @@ public class PlaybackFragment extends DialogFragment{
         editIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editFilename();
+                if (isEditing) {
+                    updateFilename();
+                    isEditing = false;
+                } else {
+                    editFilename();
+                    isEditing = true;
+                }
             }
         });
 
@@ -169,6 +183,13 @@ public class PlaybackFragment extends DialogFragment{
             @Override
             public void onClick(View v) {
                 editFilename();
+            }
+        });
+
+        cancelIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleEditState(false);
             }
         });
 
@@ -319,15 +340,16 @@ public class PlaybackFragment extends DialogFragment{
     }
 
     private void editFilename() {
-        Log.d("PlaybckFragment", "Editing File name");
         toggleEditState(true);
+    }
 
-        cancelIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleEditState(false);
-            }
-        });
+    private void updateFilename() {
+        String newFileName = editFileNameView.getText().toString();
+
+        mFileNameTextView.setText(newFileName);
+        this.changeListener.onRecordingItemRenamed(newFileName);
+
+        toggleEditState(false);
     }
 
     private void toggleEditState(boolean editing) {
@@ -341,18 +363,24 @@ public class PlaybackFragment extends DialogFragment{
             params.addRule(RelativeLayout.END_OF, editFileNameView.getId());
             editIcon.setLayoutParams(params);
 
+            editIcon.setImageResource(R.drawable.ic_action_save);
+
             editFileNameView.setText(mFileNameTextView.getText());
             editFileNameView.setSelection(0, mFileNameTextView.getText().length());
         } else {
             mFileNameTextView.setVisibility(View.VISIBLE);
             editFileNameView.setVisibility(View.GONE);
             cancelIcon.setVisibility(View.GONE);
-
+            editIcon.setImageResource(R.drawable.ic_action_edit);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(editIcon.getWidth(), editIcon.getHeight());
             params.addRule(RelativeLayout.RIGHT_OF, mFileNameTextView.getId());
             params.addRule(RelativeLayout.END_OF, mFileNameTextView.getId());
             editIcon.setLayoutParams(params);
         }
+    }
+
+    public void setOnRecordingItemChangedListener(OnRecordingItemChangedListener listener) {
+        this.changeListener = listener;
     }
 
     //updating mSeekBar
