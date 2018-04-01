@@ -50,6 +50,7 @@ public class PlaybackFragment extends DialogFragment{
     private TextView mFileLengthTextView = null;
     private ImageView editIcon = null;
     private ImageView cancelIcon = null;
+    private ImageView shareIcon = null;
     private EditText editFileNameView = null;
     private TextView fileExtensionTextView = null;
     private OnRecordingItemChangedListener changeListener;
@@ -106,7 +107,7 @@ public class PlaybackFragment extends DialogFragment{
         fileExtensionTextView = (TextView) view.findViewById(R.id.file_extension_text_view);
         editIcon = (ImageView) view.findViewById(R.id.edit_action_icon);
         cancelIcon = (ImageView) view.findViewById(R.id.edit_action_cancel);
-
+        shareIcon = (ImageView) view.findViewById(R.id.share_icon);
         mSeekBar = (SeekBar) view.findViewById(R.id.seekbar);
         ColorFilter filter = new LightingColorFilter
                 (getResources().getColor(R.color.primary), getResources().getColor(R.color.primary));
@@ -193,6 +194,13 @@ public class PlaybackFragment extends DialogFragment{
             public void onClick(View view) {
                 isEditing = false;
                 toggleEditState(false);
+            }
+        });
+
+        shareIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeListener.onRecordingItemShared();
             }
         });
 

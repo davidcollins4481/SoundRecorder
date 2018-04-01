@@ -6,4 +6,5 @@ package com.danielkim.soundrecorder.listeners;
 
 public interface OnRecordingItemChangedListener {
     void onRecordingItemRenamed(String newFileName);
+    void onRecordingItemShared();
 }

@@ -87,6 +87,11 @@ public class FileViewerAdapter extends RecyclerView.Adapter<FileViewerAdapter.Re
                         public void onRecordingItemRenamed(String newFileName) {
                             rename(holder.getPosition(), newFileName);
                         }
+
+                        @Override
+                        public void onRecordingItemShared() {
+                            shareFileDialog(holder.getPosition());
+                        }
                     });
 
                     playbackFragment.show(transaction, "dialog_playback");
