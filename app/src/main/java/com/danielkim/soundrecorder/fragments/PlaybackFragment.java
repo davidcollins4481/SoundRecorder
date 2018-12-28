@@ -2,6 +2,7 @@ package com.danielkim.soundrecorder.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.media.MediaPlayer;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -364,6 +366,9 @@ public class PlaybackFragment extends DialogFragment{
     }
 
     private void toggleEditState(boolean editing) {
+        InputMethodManager imm = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+
         if (editing) {
             mFileNameTextView.setVisibility(View.GONE);
             editFileNameView.setVisibility(View.VISIBLE);
@@ -377,6 +382,9 @@ public class PlaybackFragment extends DialogFragment{
             editIcon.setImageResource(R.drawable.ic_action_save);
             fileExtensionTextView.setVisibility(View.VISIBLE);
             editFileNameView.setText("");
+
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+            editFileNameView.requestFocus();
         } else {
             mFileNameTextView.setVisibility(View.VISIBLE);
             editFileNameView.setVisibility(View.GONE);
@@ -387,6 +395,9 @@ public class PlaybackFragment extends DialogFragment{
             params.addRule(RelativeLayout.RIGHT_OF, mFileNameTextView.getId());
             params.addRule(RelativeLayout.END_OF, mFileNameTextView.getId());
             editIcon.setLayoutParams(params);
+            editFileNameView.clearFocus();
+
+            imm.hideSoftInputFromWindow(editFileNameView.getWindowToken(), 0);
         }
     }
 
